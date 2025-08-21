@@ -3,12 +3,10 @@ package de.phillipunzen.blackiiiiisCreeperRegeneration.listener;
 import de.phillipunzen.blackiiiiisCreeperRegeneration.classes.SavedBlock;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Container;
 import org.bukkit.entity.Creeper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -32,14 +30,10 @@ public class ListenerCreeperExplode implements Listener {
 
         for (Block block : blocks) {
             BlockState state = block.getState();
-            Inventory contents = null;
-
-            if (state instanceof Container container) {
-                contents = container.getInventory();
-            }
-
-            saved.add(new SavedBlock(state, contents != null ? contents.getContents() : null));
+            // Keine Inventarinhalte mehr speichern und nicht mehr leeren
+            saved.add(new SavedBlock(state, null));
         }
+
 
         new BukkitRunnable() {
             int index = 0;
@@ -54,11 +48,8 @@ public class ListenerCreeperExplode implements Listener {
                 Block block = sb.state.getBlock();
                 block.setType(sb.state.getType());
                 sb.state.update(true, false);
-
-                if (sb.contents != null && block.getState() instanceof Container container) {
-                    container.getInventory().setContents(sb.contents);
-                }
+                // Keine Wiederherstellung des Inventars
             }
-        }.runTaskTimer(plugin, 0L, 40L); // <--- das ist jetzt korrekt
+        }.runTaskTimer(plugin, 0L, 40L);
     }
 }
